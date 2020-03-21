@@ -43,78 +43,115 @@ class _ContactPageState extends State<ContactPage> {
 
     @override
     Widget build(BuildContext context) {
-        return Scaffold(
-          	appBar: AppBar(
-				backgroundColor: Colors.red,
-				title: Text(_editedContact.name ?? 'Novo Contato'),
-				centerTitle: true,
-		  	),
-		  	floatingActionButton: FloatingActionButton(
-				onPressed: () {
-					if((_editedContact.name != null &&_editedContact.name.isNotEmpty) && (_editedContact.phone != null && _editedContact.phone.isNotEmpty)) {
-						Navigator.pop(context, _editedContact);
-
-					} else {
-						if(_editedContact.name == null || _editedContact.name.isEmpty) {
-							FocusScope.of(context).requestFocus(_nameFocus);
+        return WillPopScope(
+			child: Scaffold(
+				appBar: AppBar(
+					backgroundColor: Colors.red,
+					title: Text(_editedContact.name ?? 'Novo Contato'),
+					centerTitle: true,
+				),
+				floatingActionButton: FloatingActionButton(
+					onPressed: () {
+						if((_editedContact.name != null &&_editedContact.name.isNotEmpty) && (_editedContact.phone != null && _editedContact.phone.isNotEmpty)) {
+							Navigator.pop(context, _editedContact);
 
 						} else {
-							FocusScope.of(context).requestFocus(_phoneFocus);
+							if(_editedContact.name == null || _editedContact.name.isEmpty) {
+								FocusScope.of(context).requestFocus(_nameFocus);
+
+							} else {
+								FocusScope.of(context).requestFocus(_phoneFocus);
+							}
 						}
-					}
-				},
-				child: Icon(Icons.save),
-				backgroundColor: Colors.red,
-		  	),
-		  	body: SingleChildScrollView(
-				padding: EdgeInsets.all(10.0),
-				child: Column(
-					children: <Widget>[
-						GestureDetector(
-							child: Container(
-								width: 140.0,
-								height: 140.0,
-								decoration: BoxDecoration(
-									shape: BoxShape.circle,
-									image: DecorationImage(
-										image: _editedContact.img != null ? FileImage(File(_editedContact.img)) : AssetImage("images/person.png")
-									),
-								)
+					},
+					child: Icon(Icons.save),
+					backgroundColor: Colors.red,
+				),
+				body: SingleChildScrollView(
+					padding: EdgeInsets.all(10.0),
+					child: Column(
+						children: <Widget>[
+							GestureDetector(
+								child: Container(
+									width: 140.0,
+									height: 140.0,
+									decoration: BoxDecoration(
+										shape: BoxShape.circle,
+										image: DecorationImage(
+											image: _editedContact.img != null ? FileImage(File(_editedContact.img)) : AssetImage("images/person.png")
+										),
+									)
+								),
 							),
-						),
-						TextField(
-							decoration: InputDecoration(labelText: 'Nome'),
-							onChanged: (name) {
-								_edited = true;
-								setState(() {
-									_editedContact.name = name;
-								});
-							},
-							controller: _nameController,
-							focusNode: _nameFocus,
-						),
-						TextField(
-							decoration: InputDecoration(labelText: 'E-mail'),
-							onChanged: (email) {
-								_edited = true;
-								_editedContact.email = email;
-							},
-							keyboardType: TextInputType.emailAddress,
-							controller: _emailController,
-						),
-						TextField(
-							decoration: InputDecoration(labelText: 'Telefone'),
-							onChanged: (phone) {
-								_edited = true;
-								_editedContact.phone = phone;
-							},
-							keyboardType: TextInputType.number,
-							controller: _phoneController,
-							focusNode: _phoneFocus,
-						)
-					],
-				),	  
+							TextField(
+								decoration: InputDecoration(labelText: 'Nome'),
+								onChanged: (name) {
+									_edited = true;
+									setState(() {
+										_editedContact.name = name;
+									});
+								},
+								controller: _nameController,
+								focusNode: _nameFocus,
+							),
+							TextField(
+								decoration: InputDecoration(labelText: 'E-mail'),
+								onChanged: (email) {
+									_edited = true;
+									_editedContact.email = email;
+								},
+								keyboardType: TextInputType.emailAddress,
+								controller: _emailController,
+							),
+							TextField(
+								decoration: InputDecoration(labelText: 'Telefone'),
+								onChanged: (phone) {
+									_edited = true;
+									_editedContact.phone = phone;
+								},
+								keyboardType: TextInputType.number,
+								controller: _phoneController,
+								focusNode: _phoneFocus,
+							)
+						],
+					),	  
+				), 
 			), 
-        );
+			onWillPop: _requestPop
+		);
     }
+
+	Future<bool> _requestPop() {
+		if(_edited) {
+			showDialog(
+				context: context,
+				builder: (context) {
+					return AlertDialog(
+						title: Text("Descartar alterações?"),
+						content: Text("Se sair, as alterações serão perdidas."),
+						actions: <Widget>[
+							FlatButton(
+								onPressed: () {
+									Navigator.pop(context);
+								}, 
+								child: Text("Cancelar")
+							),
+							FlatButton(
+								onPressed: () {
+									Navigator.pop(context);
+									Navigator.pop(context);
+								}, 
+								child: Text("Sim")
+							),
+						],
+					);
+				}
+			);
+
+			return Future.value(false);
+
+		} else {
+			return Future.value(true);
+		}
+	}
 }
