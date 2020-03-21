@@ -19,6 +19,8 @@ class _ContactPageState extends State<ContactPage> {
 	final _emailController = TextEditingController();
 	final _phoneController = TextEditingController();
 
+	final _nameFocus = FocusNode();
+	final _phoneFocus = FocusNode();
 
 	bool _edited = false;
 	Contact _editedContact;
@@ -48,7 +50,19 @@ class _ContactPageState extends State<ContactPage> {
 				centerTitle: true,
 		  	),
 		  	floatingActionButton: FloatingActionButton(
-				onPressed: () => {},
+				onPressed: () {
+					if((_editedContact.name != null &&_editedContact.name.isNotEmpty) && (_editedContact.phone != null && _editedContact.phone.isNotEmpty)) {
+						Navigator.pop(context, _editedContact);
+
+					} else {
+						if(_editedContact.name == null || _editedContact.name.isEmpty) {
+							FocusScope.of(context).requestFocus(_nameFocus);
+
+						} else {
+							FocusScope.of(context).requestFocus(_phoneFocus);
+						}
+					}
+				},
 				child: Icon(Icons.save),
 				backgroundColor: Colors.red,
 		  	),
@@ -77,6 +91,7 @@ class _ContactPageState extends State<ContactPage> {
 								});
 							},
 							controller: _nameController,
+							focusNode: _nameFocus,
 						),
 						TextField(
 							decoration: InputDecoration(labelText: 'E-mail'),
@@ -95,6 +110,7 @@ class _ContactPageState extends State<ContactPage> {
 							},
 							keyboardType: TextInputType.number,
 							controller: _phoneController,
+							focusNode: _phoneFocus,
 						)
 					],
 				),	  
