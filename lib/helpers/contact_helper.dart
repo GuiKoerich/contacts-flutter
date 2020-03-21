@@ -80,7 +80,7 @@ class ContactHelper {
     Future<List> getAllContacts() async {
         Database dbContact = await db;
 
-        List listMap = await dbContact.rawQuery("SELECT * FROM $contactTable");
+        List listMap = await dbContact.rawQuery("SELECT * FROM $contactTable ORDER BY $nameColumn");
         List<Contact> listContact = List();
 
         for(Map contactMap in listMap) {
